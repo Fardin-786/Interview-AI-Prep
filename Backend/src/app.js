@@ -12,34 +12,53 @@ const app = express()
 app.set("trust proxy", 1)
 
 // Middleware for parsing JSON payloads and cookies
-app.use(express.json())
+app.use(express.json({ limit: "10mb" }))
 app.use(cookieParser())
 
-// Dynamic CORS configuration allowing localhost ports and environment origins
-const configuredOrigins = process.env.FRONTEND_URL
-    ? process.env.FRONTEND_URL.split(",").map(url => url.trim().replace(/\/$/, ""))
-    : []
-
+// Origins allowed by default
 const defaultOrigins = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5173",
-    "http://127.0.0.1:5174"
+    "http://127.0.0.1:5174",
+    "https://interview-ai-prep-nu.vercel.app"
 ]
 
-const allowedOrigins = [...new Set([...configuredOrigins, ...defaultOrigins])]
+const configuredOrigins = process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL.split(",").map(url => url.trim().replace(/\/$/, ""))
+    : []
 
-app.use(cors({
+const allowedOrigins = [...new Set([...defaultOrigins, ...configuredOrigins])]
+
+const corsOptions = {
     origin: function (origin, callback) {
-        // Allow requests with no origin (e.g. mobile apps, curl) or matching allowed origins
-        if (!origin || allowedOrigins.includes(origin) || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error(`CORS blocked for origin: ${origin}`));
+        // Allow requests with no origin (e.g. mobile apps, curl, Postman, server-to-server)
+        if (!origin) {
+            return callback(null, true);
         }
+
+        // Allow localhost and local loopback on any port
+        const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+
+        // Allow all Vercel deployment URLs (production, preview branches, PR deploys)
+        const isVercel = /^https:\/\/([a-zA-Z0-9-]+\.)*vercel\.app$/.test(origin);
+
+        // Allow explicitly configured origins
+        const isAllowedOrigin = allowedOrigins.includes(origin);
+
+        if (isLocalhost || isVercel || isAllowedOrigin) {
+            return callback(null, true);
+        }
+
+        // Return false gracefully without throwing an unhandled server error
+        return callback(null, false);
     },
-    credentials: true
-}))
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie", "X-Requested-With", "Accept", "Origin"]
+}
+
+app.use(cors(corsOptions))
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

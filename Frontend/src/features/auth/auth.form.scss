@@ -133,14 +133,15 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
                     &:-webkit-autofill,
                     &:-webkit-autofill:hover,
                     &:-webkit-autofill:focus,
-                    &:-webkit-autofill:active {
+                    &:-webkit-autofill:active,
+                    &:autofill {
                         -webkit-box-shadow: 0 0 0 1000px $bg-input inset !important;
                         box-shadow: 0 0 0 1000px $bg-input inset !important;
                         -webkit-text-fill-color: $text-primary !important;
                         color: $text-primary !important;
                         caret-color: $text-primary !important;
-                        border-color: $border-color;
-                        transition: background-color 5000s ease-in-out 0s;
+                        border-color: $border-color !important;
+                        transition: background-color 5000000s ease-in-out 0s, color 5000000s ease-in-out 0s;
                     }
                 }
 

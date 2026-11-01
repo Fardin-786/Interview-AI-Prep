@@ -6,9 +6,11 @@
     box-sizing: border-box;
 }
 
+:root,
 html,
 body,
 #root {
+    color-scheme: dark;
     width: 100%;
     background-color: #161616;
     color: whitesmoke;
