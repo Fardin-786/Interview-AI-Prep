@@ -146,6 +146,38 @@ $text-muted: #8b949e;
                 }
             }
 
+            // Print / Save PDF
+            .btn-print-pdf {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                background: #1e2535;
+                border: 1px solid $border-color;
+                color: $text-light;
+                padding: 7px 13px;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                svg {
+                    width: 14px;
+                    height: 14px;
+                }
+
+                &:hover:not(:disabled) {
+                    background-color: #242c3d;
+                    border-color: #475569;
+                    color: #ffffff;
+                }
+
+                &:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+            }
+
             // Download PDF
             .btn-download-pdf {
                 display: flex;
