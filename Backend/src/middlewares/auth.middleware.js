@@ -7,7 +7,9 @@ const { isTokenBlacklisted } = require("../config/redis")
  * @description Mandatory authentication middleware. Rejects requests if token is missing or blacklisted.
  */
 async function authUser(req, res, next) {
-    const token = req.cookies.token
+    const authHeader = req.headers.authorization
+    const bearerToken = authHeader && authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : null
+    const token = req.cookies.token || bearerToken
 
     if (!token) {
         return res.status(401).json({
@@ -48,7 +50,10 @@ async function authUser(req, res, next) {
  * @description Optional authentication middleware. Attaches user object if valid token exists.
  */
 async function optionalAuthUser(req, res, next) {
-    const token = req.cookies.token
+    const authHeader = req.headers.authorization
+    const bearerToken = authHeader && authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : null
+    const token = req.cookies.token || bearerToken
+
     if (!token) {
         req.user = null
         return next()

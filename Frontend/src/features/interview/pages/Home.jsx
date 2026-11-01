@@ -113,7 +113,7 @@ const Home = () => {
                             <polyline points="2 12 12 17 22 12" />
                         </svg>
                     </div>
-                    <span>GEN-AI <span className='highlight'>Strategist</span></span>
+                    <span>PrepStrategist <span className='highlight'>AI</span></span>
                 </Link>
 
                 <div className='nav-user-area'>

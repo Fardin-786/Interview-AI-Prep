@@ -42,12 +42,12 @@ async function sendVerificationOtpEmail({ email, username, otp }) {
 <body>
   <div class="container">
     <div class="header">
-      <h1>GEN-AI Strategist</h1>
+      <h1>PrepStrategist AI</h1>
     </div>
     <div class="body">
       <div class="greeting">Hello ${username || "User"},</div>
       <div class="message">
-        Thank you for registering with GEN-AI Strategist. Please enter the 6-digit verification code below to verify your email address and activate your account.
+        Thank you for registering with PrepStrategist AI. Please enter the 6-digit verification code below to verify your email address and activate your account.
       </div>
 
       <div class="otp-box">
@@ -60,7 +60,7 @@ async function sendVerificationOtpEmail({ email, username, otp }) {
       </div>
     </div>
     <div class="footer">
-      &copy; ${new Date().getFullYear()} GEN-AI Interview Strategist. All rights reserved.
+      &copy; ${new Date().getFullYear()} PrepStrategist AI. All rights reserved.
     </div>
   </div>
 </body>
@@ -74,9 +74,9 @@ async function sendVerificationOtpEmail({ email, username, otp }) {
     try {
         const transporter = createTransporter()
         await transporter.sendMail({
-            from: `"GEN-AI Strategist" <${process.env.SMTP_USER}>`,
+            from: `"PrepStrategist AI" <${process.env.SMTP_USER}>`,
             to: email,
-            subject: `${otp} is your GEN-AI Email Verification Code`,
+            subject: `${otp} is your PrepStrategist AI Verification Code`,
             html: htmlContent
         })
         console.log(`✅ Verification OTP Email successfully sent to ${email}`)
@@ -119,7 +119,7 @@ async function sendPasswordResetOtpEmail({ email, username, otp }) {
     <div class="body">
       <div class="greeting">Hello ${username || "User"},</div>
       <div class="message">
-        We received a request to reset your password for your GEN-AI Strategist account. Please enter the 6-digit verification code below to proceed with setting a new password.
+        We received a request to reset your password for your PrepStrategist AI account. Please enter the 6-digit verification code below to proceed with setting a new password.
       </div>
 
       <div class="otp-box">
@@ -132,7 +132,7 @@ async function sendPasswordResetOtpEmail({ email, username, otp }) {
       </div>
     </div>
     <div class="footer">
-      &copy; ${new Date().getFullYear()} GEN-AI Interview Strategist. All rights reserved.
+      &copy; ${new Date().getFullYear()} PrepStrategist AI. All rights reserved.
     </div>
   </div>
 </body>
@@ -146,9 +146,9 @@ async function sendPasswordResetOtpEmail({ email, username, otp }) {
     try {
         const transporter = createTransporter()
         await transporter.sendMail({
-            from: `"GEN-AI Security" <${process.env.SMTP_USER}>`,
+            from: `"PrepStrategist AI Security" <${process.env.SMTP_USER}>`,
             to: email,
-            subject: `${otp} is your GEN-AI Password Reset Code`,
+            subject: `${otp} is your PrepStrategist AI Password Reset Code`,
             html: htmlContent
         })
         console.log(`✅ Password Reset OTP Email successfully sent to ${email}`)

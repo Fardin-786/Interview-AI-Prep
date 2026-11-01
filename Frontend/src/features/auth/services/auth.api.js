@@ -1,8 +1,17 @@
 import axios from "axios"
 
 const api = axios.create({
-    baseURL: "http://localhost:8000",
+    baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
     withCredentials: true
+})
+
+// Attach Bearer token from localStorage as fallback for cross-domain auth
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("token")
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
 })
 
 export async function register({ username, email, password }) {
@@ -65,6 +74,9 @@ export async function login({ email, password }) {
         const response = await api.post("/api/auth/login", {
             email, password
         })
+        if (response.data?.token) {
+            localStorage.setItem("token", response.data.token)
+        }
         return response.data
     } catch (err) {
         throw err?.response?.data || err
@@ -74,8 +86,10 @@ export async function login({ email, password }) {
 export async function logout() {
     try {
         const response = await api.get("/api/auth/logout")
+        localStorage.removeItem("token")
         return response.data
     } catch (err) {
+        localStorage.removeItem("token")
         return null
     }
 }

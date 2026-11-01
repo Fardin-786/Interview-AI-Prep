@@ -18,7 +18,7 @@ const Landing = () => {
                             <polyline points="2 12 12 17 22 12" />
                         </svg>
                     </div>
-                    <span className='logo-text'>GEN-AI <span>Interview</span></span>
+                    <span className='logo-text'>PrepStrategist <span>AI</span></span>
                 </Link>
 
                 <div className='auth-actions'>
@@ -151,7 +151,7 @@ const Landing = () => {
 
             {/* Footer */}
             <footer className='landing-footer'>
-                <p>&copy; {new Date().getFullYear()} GEN-AI Interview Strategist. All rights reserved.</p>
+                <p>&copy; {new Date().getFullYear()} PrepStrategist AI. All rights reserved.</p>
                 <div className='footer-links'>
                     <a href='#'>Privacy Policy</a>
                     <a href='#'>Terms of Service</a>

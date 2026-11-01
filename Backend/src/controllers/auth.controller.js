@@ -296,11 +296,21 @@ async function loginUserController(req, res) {
             { expiresIn: "1d" }
         )
 
-        // Set HTTP-only cookie
-        res.cookie("token", token)
+        // Cross-domain cookie configuration for production environments
+        const isProduction = process.env.NODE_ENV === "production"
+        const cookieOptions = {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? "none" : "lax",
+            maxAge: 24 * 60 * 60 * 1000 // 1 day
+        }
+
+        // Set secure HTTP-only cookie
+        res.cookie("token", token, cookieOptions)
 
         return res.status(200).json({
             message: "User logged in successfully.",
+            token,
             user: {
                 id: user._id,
                 username: user.username,
@@ -322,19 +332,29 @@ async function loginUserController(req, res) {
  * @access Public
  */
 async function logoutUserController(req, res) {
+    const isProduction = process.env.NODE_ENV === "production"
+    const clearOptions = {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax"
+    }
+
     try {
-        const token = req.cookies.token
+        const authHeader = req.headers.authorization
+        const bearerToken = authHeader && authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : null
+        const token = req.cookies.token || bearerToken
+
         if (token) {
             await blacklistToken(token, 86400) // ⚡ Blacklist in Redis RAM (<1ms)
             await tokenBlacklistModel.create({ token }) // MongoDB Backup
         }
 
-        res.clearCookie("token")
+        res.clearCookie("token", clearOptions)
         return res.status(200).json({
             message: "User logged out successfully."
         })
     } catch (err) {
-        res.clearCookie("token")
+        res.clearCookie("token", clearOptions)
         return res.status(200).json({
             message: "User logged out successfully."
         })
