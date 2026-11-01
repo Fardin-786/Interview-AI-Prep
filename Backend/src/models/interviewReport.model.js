@@ -98,6 +98,15 @@ const interviewReportSchema = new mongoose.Schema({
     title: {
         type: String,
         required: [ true, "Job title is required" ]
+    },
+    resumeHtml: {
+        type: String,
+        default: ""
+    },
+    selectedTemplate: {
+        type: String,
+        enum: [ "modern", "classic", "executive" ],
+        default: "modern"
     }
 }, {
     timestamps: true

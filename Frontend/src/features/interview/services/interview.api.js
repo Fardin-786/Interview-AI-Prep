@@ -60,3 +60,33 @@ export const generateResumePdf = async ({ interviewReportId }) => {
 
     return response.data
 }
+
+/**
+ * @description Fetch cached or generate tailored resume HTML for live preview.
+ */
+export const getResumeHtml = async (interviewReportId) => {
+    const response = await api.get(`/api/interview/resume/html/${interviewReportId}`)
+    return response.data
+}
+
+/**
+ * @description Regenerate resume HTML with Gemini AI.
+ */
+export const regenerateResumeHtml = async ({ interviewReportId, instructions }) => {
+    const response = await api.post(`/api/interview/resume/regenerate/${interviewReportId}`, { instructions })
+    return response.data
+}
+
+/**
+ * @description Export custom edited HTML and chosen template into an A4 PDF via Puppeteer.
+ */
+export const exportCustomResumePdf = async ({ htmlContent, template, fileName }) => {
+    const response = await api.post('/api/interview/resume/export-pdf', {
+        htmlContent,
+        template,
+        fileName
+    }, {
+        responseType: "blob"
+    })
+    return response.data
+}

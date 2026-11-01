@@ -1,0 +1,441 @@
+@use "sass:color";
+
+$bg-backdrop: rgba(10, 14, 23, 0.88);
+$bg-bar: #161b22;
+$border-color: #2a3348;
+$accent: #ff2d78;
+$text-light: #e6edf3;
+$text-muted: #8b949e;
+
+.resume-studio-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: $bg-backdrop;
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    // ── Studio Top Toolbar ──────────────────────────────────────────────────────
+    .studio-toolbar {
+        height: 68px;
+        background-color: $bg-bar;
+        border-bottom: 1px solid $border-color;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1.5rem;
+        flex-shrink: 0;
+        gap: 1rem;
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+
+            .studio-badge {
+                background: linear-gradient(135deg, rgba($accent, 0.2), rgba($accent, 0.05));
+                border: 1px solid rgba($accent, 0.4);
+                color: $accent;
+                padding: 4px 10px;
+                border-radius: 20px;
+                font-size: 0.75rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            h2 {
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: $text-light;
+                margin: 0;
+            }
+        }
+
+        .controls-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            // Template Switcher Pills
+            .template-picker {
+                display: flex;
+                background-color: #0d1117;
+                border: 1px solid $border-color;
+                border-radius: 8px;
+                padding: 3px;
+
+                .tpl-btn {
+                    background: transparent;
+                    border: none;
+                    color: $text-muted;
+                    font-size: 0.82rem;
+                    font-weight: 600;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+
+                    &:hover {
+                        color: $text-light;
+                    }
+
+                    &.active {
+                        background-color: #242c3d;
+                        color: #ffffff;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+                    }
+                }
+            }
+
+            // Edit Mode Toggle
+            .edit-toggle-btn {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                background-color: #0d1117;
+                border: 1px solid $border-color;
+                color: $text-light;
+                padding: 7px 14px;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+
+                svg {
+                    width: 15px;
+                    height: 15px;
+                }
+
+                &.active {
+                    border-color: #38bdf8;
+                    background-color: rgba(56, 189, 248, 0.12);
+                    color: #38bdf8;
+                }
+            }
+
+            // Regenerate AI Button
+            .btn-regenerate {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                background: transparent;
+                border: 1px solid $border-color;
+                color: $text-light;
+                padding: 7px 14px;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+
+                &:hover:not(:disabled) {
+                    background-color: #1e2535;
+                    border-color: #475569;
+                }
+
+                &:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+            }
+
+            // Download PDF
+            .btn-download-pdf {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                background: linear-gradient(135deg, $accent, #d20d3b);
+                border: none;
+                color: #ffffff;
+                padding: 8px 18px;
+                border-radius: 8px;
+                font-size: 0.88rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s;
+                box-shadow: 0 4px 14px rgba($accent, 0.35);
+
+                &:hover:not(:disabled) {
+                    transform: translateY(-1px);
+                    box-shadow: 0 6px 18px rgba($accent, 0.5);
+                }
+
+                &:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
+            }
+
+            .close-studio-btn {
+                background: transparent;
+                border: none;
+                color: $text-muted;
+                font-size: 1.6rem;
+                line-height: 1;
+                cursor: pointer;
+                padding: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: color 0.2s;
+
+                &:hover {
+                    color: #ffffff;
+                }
+            }
+        }
+    }
+
+    // ── Edit Info Banner ────────────────────────────────────────────────────────
+    .edit-notice-bar {
+        background-color: rgba(56, 189, 248, 0.1);
+        border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+        color: #7dd3fc;
+        padding: 6px 1.5rem;
+        font-size: 0.82rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex-shrink: 0;
+
+        strong {
+            font-weight: 700;
+        }
+    }
+
+    // ── Studio Canvas & A4 Sheet Viewport ───────────────────────────────────────
+    .studio-viewport {
+        flex: 1;
+        overflow-y: auto;
+        padding: 2.5rem 1rem 4rem;
+        display: flex;
+        justify-content: center;
+        background-color: #080b11;
+
+        .a4-paper-container {
+            width: 210mm;
+            min-height: 297mm;
+            background-color: #ffffff;
+            color: #0f172a;
+            padding: 12mm 15mm;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+            box-sizing: border-box;
+            transition: all 0.25s ease;
+            font-size: 9pt;
+            line-height: 1.35;
+
+            &.editable-active {
+                outline: 2px dashed rgba(56, 189, 248, 0.6);
+                outline-offset: 4px;
+                cursor: text;
+            }
+
+            // ── Modern Template ──
+            &.template-modern {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                color: #1e293b;
+                line-height: 1.35;
+
+                .candidate-name {
+                    font-size: 18pt;
+                    font-weight: 800;
+                    color: #0f172a;
+                    margin: 0 0 2px 0;
+                    letter-spacing: -0.3px;
+                }
+                .candidate-target-title {
+                    font-size: 10.5pt;
+                    font-weight: 700;
+                    color: $accent;
+                    margin-bottom: 3px;
+                }
+                .candidate-contact {
+                    font-size: 8.5pt;
+                    color: #64748b;
+                    margin-bottom: 8px;
+                }
+                .section-title {
+                    font-size: 9.5pt;
+                    font-weight: 700;
+                    color: #0f172a;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    border-bottom: 1.5px solid $accent;
+                    padding-bottom: 2px;
+                    margin-top: 8px;
+                    margin-bottom: 4px;
+                }
+                .skills-list {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 4px;
+                    margin: 3px 0 5px 0;
+                }
+                .skill-tag {
+                    background: #f1f5f9;
+                    color: #1e293b;
+                    font-size: 8pt;
+                    font-weight: 600;
+                    padding: 2px 5px;
+                    border-radius: 3px;
+                    border: 1px solid #e2e8f0;
+                    display: inline-block;
+                }
+            }
+
+            // ── Classic ATS Template ──
+            &.template-classic {
+                font-family: "Times New Roman", Times, Georgia, serif;
+                color: #000000;
+                line-height: 1.3;
+
+                .resume-header {
+                    text-align: center;
+                    border-bottom: 1.5px solid #000;
+                    padding-bottom: 6px;
+                    margin-bottom: 8px;
+                }
+                .candidate-name {
+                    font-size: 18pt;
+                    font-weight: bold;
+                    margin: 0 0 2px 0;
+                    text-transform: uppercase;
+                }
+                .candidate-target-title {
+                    font-size: 10.5pt;
+                    font-style: italic;
+                    margin-bottom: 2px;
+                }
+                .candidate-contact {
+                    font-size: 8.5pt;
+                }
+                .section-title {
+                    font-size: 9.5pt;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    border-bottom: 1px solid #000;
+                    padding-bottom: 2px;
+                    margin-top: 8px;
+                    margin-bottom: 4px;
+                    letter-spacing: 0.8px;
+                }
+                .skill-tag {
+                    display: inline-block;
+                    margin-right: 6px;
+                    font-size: 8.8pt;
+
+                    &:not(:last-child)::after {
+                        content: " •";
+                    }
+                }
+            }
+
+            // ── Executive Template ──
+            &.template-executive {
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                color: #1a202c;
+                line-height: 1.35;
+
+                .candidate-name {
+                    font-size: 18pt;
+                    font-weight: 700;
+                    color: #1a365d;
+                    margin: 0;
+                }
+                .candidate-target-title {
+                    font-size: 10.5pt;
+                    font-weight: 600;
+                    color: #2b6cb0;
+                    margin-bottom: 3px;
+                }
+                .candidate-contact {
+                    font-size: 8.5pt;
+                    color: #718096;
+                    border-bottom: 1px solid #e2e8f0;
+                    padding-bottom: 6px;
+                    margin-bottom: 8px;
+                }
+                .section-title {
+                    font-size: 9.5pt;
+                    font-weight: 700;
+                    color: #2b6cb0;
+                    border-left: 3px solid #2b6cb0;
+                    padding-left: 6px;
+                    margin-top: 8px;
+                    margin-bottom: 4px;
+                    text-transform: uppercase;
+                }
+                .skill-tag {
+                    display: inline-block;
+                    background: #edf2f7;
+                    color: #2b6cb0;
+                    padding: 1.5px 5px;
+                    border-radius: 3px;
+                    font-size: 8pt;
+                    margin-right: 4px;
+                    margin-bottom: 3px;
+                }
+            }
+
+            // Common Internal Structure
+            .resume-section {
+                margin-bottom: 7px;
+            }
+            .summary-text {
+                margin: 0 0 3px 0;
+                font-size: 8.8pt;
+                color: #334155;
+                line-height: 1.32;
+            }
+            .job-entry, .project-entry {
+                margin-bottom: 5px;
+            }
+            .job-header, .project-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                font-size: 9.2pt;
+            }
+            .job-role, .project-name {
+                font-weight: 700;
+                color: #0f172a;
+            }
+            .job-dates, .project-tech {
+                font-size: 8.2pt;
+                color: #64748b;
+                font-weight: 600;
+            }
+            .job-company {
+                font-size: 8.2pt;
+                font-style: italic;
+                color: #475569;
+                margin-bottom: 2px;
+            }
+            .job-bullets {
+                margin: 2px 0 3px 0;
+                padding-left: 14px;
+
+                li {
+                    margin-bottom: 2px;
+                    font-size: 8.6pt;
+                    line-height: 1.3;
+                    color: #334155;
+                }
+            }
+            .edu-entry {
+                font-size: 8.6pt;
+                margin-bottom: 2px;
+                color: #334155;
+            }
+        }
+    }
+}

@@ -31,7 +31,28 @@ interviewRouter.get("/", authMiddleware.authUser, interviewController.getAllInte
 
 
 /**
- * @route GET /api/interview/resume/pdf
+ * @route GET /api/interview/resume/html/:interviewReportId
+ * @description Fetch cached or generate tailored resume HTML for live preview.
+ * @access private
+ */
+interviewRouter.get("/resume/html/:interviewReportId", authMiddleware.authUser, interviewController.getResumeHtmlController)
+
+/**
+ * @route POST /api/interview/resume/regenerate/:interviewReportId
+ * @description Regenerate fresh resume HTML with AI.
+ * @access private
+ */
+interviewRouter.post("/resume/regenerate/:interviewReportId", authMiddleware.authUser, interviewController.regenerateResumeHtmlController)
+
+/**
+ * @route POST /api/interview/resume/export-pdf
+ * @description Convert custom edited HTML & template into an A4 PDF.
+ * @access private
+ */
+interviewRouter.post("/resume/export-pdf", authMiddleware.authUser, interviewController.exportCustomResumePdfController)
+
+/**
+ * @route POST /api/interview/resume/pdf/:interviewReportId
  * @description generate resume pdf on the basis of user self description, resume content and job description.
  * @access private
  */

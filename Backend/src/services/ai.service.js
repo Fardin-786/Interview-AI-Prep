@@ -224,14 +224,28 @@ async function generatePdfFromHtml(htmlContent) {
         const page = await browser.newPage()
 
         await page.setContent(htmlContent, { waitUntil: "networkidle0" })
+
+        // Smart 1-Page Auto-Fit: If content exceeds A4 height, dynamically scale down to guarantee single-page fit
+        await page.evaluate(() => {
+            const maxPrintableHeight = 1060; // 297mm A4 minus margins in px
+            const content = document.body;
+            if (content && content.scrollHeight > maxPrintableHeight) {
+                const scaleFactor = Math.max(0.82, Number((maxPrintableHeight / content.scrollHeight).toFixed(3)));
+                content.style.transform = `scale(${scaleFactor})`;
+                content.style.transformOrigin = 'top center';
+                content.style.width = `${Number((100 / scaleFactor).toFixed(2))}%`;
+            }
+        })
+
         const pdfBuffer = await page.pdf({
             format: "A4",
             printBackground: true,
+            preferCSSPageSize: true,
             margin: {
-                top: "15mm",
-                right: "15mm",
-                bottom: "15mm",
-                left: "15mm"
+                top: "0px",
+                right: "0px",
+                bottom: "0px",
+                left: "0px"
             }
         })
 
@@ -293,14 +307,14 @@ function buildDefaultResumeHtml({ resume, selfDescription, jobDescription }) {
 }
 
 /**
- * @name generateResumePdf
- * @description Generates a customized ATS-friendly resume HTML via Multi-Model Gemini AI and exports as a downloadable PDF.
+ * @name generateResumeHtml
+ * @description Generates a customized ATS-friendly resume HTML via Multi-Model Gemini AI.
  */
-async function generateResumePdf({ resume, selfDescription, jobDescription }) {
-    const prompt = `You are an expert resume writer and ATS optimization specialist.
-Generate a clean, highly professional, ATS-friendly A4 HTML resume tailored specifically to the target job description.
+async function generateResumeHtml({ resume, selfDescription, jobDescription, instructions }) {
+    const prompt = `You are an expert resume writer and ATS (Applicant Tracking System) optimization specialist.
+Generate a clean, highly professional, ATS-friendly HTML resume tailored specifically to the target job description.
 
-Candidate Resume Details:
+Candidate Resume / Profile Details:
 ${resume || "Not provided"}
 
 Candidate Self-Description:
@@ -309,9 +323,66 @@ ${selfDescription || "Not provided"}
 Target Job Description:
 ${jobDescription}
 
+${instructions ? `Additional User Instructions: ${instructions}` : ""}
+
+GUIDELINES:
+1. Use strong, metric-driven action verbs (e.g., "Architected", "Engineered", "Reduced latency by 40%", "Scaled").
+2. Align candidate's skills directly with the key requirements of the target job description.
+3. Use clean semantic HTML tags. Do NOT include <html>, <head>, or <body> tags, only the resume container content:
+   - <div class="resume-container">
+     - <div class="resume-header">
+         <h1 class="candidate-name">Candidate Name</h1>
+         <div class="candidate-target-title">Target Job Title</div>
+         <div class="candidate-contact">email@example.com | +1 (555) 000-0000 | City, Country | linkedin.com/in/profile | github.com/profile</div>
+       </div>
+     - <div class="resume-section">
+         <h2 class="section-title">Professional Summary</h2>
+         <p class="summary-text">Tailored professional summary highlighting core expertise...</p>
+       </div>
+     - <div class="resume-section">
+         <h2 class="section-title">Technical Competencies</h2>
+         <div class="skills-list">
+           <span class="skill-tag">Language / Skill 1</span>
+           <span class="skill-tag">Framework 2</span>
+         </div>
+       </div>
+     - <div class="resume-section">
+         <h2 class="section-title">Professional Experience</h2>
+         <div class="job-entry">
+           <div class="job-header">
+             <strong class="job-role">Role Title</strong>
+             <span class="job-dates">Month Year – Present</span>
+           </div>
+           <div class="job-company">Company Name, Location</div>
+           <ul class="job-bullets">
+             <li>Accomplished [X] as measured by [Y] by doing [Z]...</li>
+             <li>Engineered scalable solutions...</li>
+           </ul>
+         </div>
+       </div>
+     - <div class="resume-section">
+         <h2 class="section-title">Key Projects</h2>
+         <div class="project-entry">
+           <div class="project-header">
+             <strong class="project-name">Project Name</strong>
+             <span class="project-tech">React, Node.js, MongoDB</span>
+           </div>
+           <ul class="job-bullets">
+             <li>Built full-stack application...</li>
+           </ul>
+         </div>
+       </div>
+     - <div class="resume-section">
+         <h2 class="section-title">Education & Certifications</h2>
+         <div class="edu-entry">
+           <strong>Degree / Certificate</strong> — Institution Name, Year
+         </div>
+       </div>
+   - </div>
+
 You MUST return ONLY a JSON object with a single field "html":
 {
-  "html": "<!DOCTYPE html><html><head><style>body { font-family: Arial, sans-serif; font-size: 13px; line-height: 1.5; color: #333; margin: 0; padding: 20px; } h1 { font-size: 24px; color: #1a365d; margin: 0 0 4px 0; } h2 { font-size: 14px; color: #2b6cb0; border-bottom: 1.5px solid #cbd5e0; padding-bottom: 4px; margin-top: 18px; margin-bottom: 8px; text-transform: uppercase; } ul { margin: 6px 0; padding-left: 18px; } li { margin-bottom: 4px; }</style></head><body><h1>Candidate Name</h1><p style='color:#4a5568; font-weight:bold;'>Target Job Title</p><h2>Professional Summary</h2><p>Tailored professional summary...</p><h2>Technical Skills</h2><p>Key skills...</p><h2>Professional Experience</h2><h3>Senior Engineer</h3><ul><li>Achievement bullet point...</li></ul><h2>Education & Certification</h2><p>Degree details...</p></body></html>"
+  "html": "<div class=\\"resume-container\\">...</div>"
 }`
 
     let htmlContent = ""
@@ -327,8 +398,22 @@ You MUST return ONLY a JSON object with a single field "html":
         htmlContent = buildDefaultResumeHtml({ resume, selfDescription, jobDescription })
     }
 
+    return htmlContent
+}
+
+/**
+ * @name generateResumePdf
+ * @description Generates customized resume HTML and exports as a downloadable PDF buffer.
+ */
+async function generateResumePdf({ resume, selfDescription, jobDescription }) {
+    const htmlContent = await generateResumeHtml({ resume, selfDescription, jobDescription })
     const pdfBuffer = await generatePdfFromHtml(htmlContent)
     return pdfBuffer
 }
 
-module.exports = { generateInterviewReport, generateResumePdf }
+module.exports = { 
+    generateInterviewReport, 
+    generateResumeHtml, 
+    generatePdfFromHtml, 
+    generateResumePdf 
+}
