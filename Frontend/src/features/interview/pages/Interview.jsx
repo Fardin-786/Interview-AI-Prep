@@ -101,6 +101,16 @@ const Interview = () => {
 
                 {/* ── Left Nav ── */}
                 <nav className='interview-nav'>
+                    <div className="nav-top-header">
+                        <Link to="/dashboard" className="back-dashboard-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="19" y1="12" x2="5" y2="12"></line>
+                                <polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                            Back to Dashboard
+                        </Link>
+                    </div>
+
                     <div className="nav-content">
                         <p className='interview-nav__label'>Sections</p>
                         {NAV_ITEMS.map(item => (
@@ -116,7 +126,7 @@ const Interview = () => {
                     </div>
                     <button
                         onClick={() => setIsResumeStudioOpen(true)}
-                        className='button primary-button'
+                        className='button primary-button customize-resume-btn'
                         style={{ background: 'linear-gradient(135deg, #ff2d78, #d20d3b)', boxShadow: '0 4px 15px rgba(255, 45, 120, 0.35)' }}>
                         <svg height={"1rem"} style={{ marginRight: "0.6rem" }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>

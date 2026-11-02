@@ -258,3 +258,35 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
     0% { transform: translateX(-100%); }
     100% { transform: translateX(250%); }
 }
+
+@media (max-width: 500px) {
+    .saas-page-loader {
+        padding: 1rem;
+
+        .loader-card {
+            padding: 2rem 1.25rem;
+            border-radius: 16px;
+
+            h2 {
+                font-size: 1.15rem;
+            }
+
+            p {
+                font-size: 0.82rem;
+            }
+        }
+    }
+
+    .resume-generator-modal .resume-loader-card {
+        padding: 2rem 1.25rem;
+        border-radius: 16px;
+
+        h2 {
+            font-size: 1.15rem;
+        }
+
+        .resume-stage-steps {
+            padding: 0.75rem 1rem;
+        }
+    }
+}

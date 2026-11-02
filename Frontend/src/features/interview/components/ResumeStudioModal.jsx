@@ -338,6 +338,11 @@ const ResumeStudioModal = ({ isOpen, onClose, interviewReportId, jobTitle }) => 
                 </div>
             )}
 
+            {/* Mobile swipe hint */}
+            <div className='mobile-preview-hint'>
+                <span>↔️ Swipe horizontally to view full A4 resume</span>
+            </div>
+
             {/* A4 Paper Viewport */}
             <main className='studio-viewport'>
                 {isLoading ? (
