@@ -39,36 +39,113 @@ const QuestionCard = ({ item, index }) => {
     )
 }
 
-const RoadMapDay = ({ day }) => (
-    <div className='roadmap-day'>
-        <div className='roadmap-day__header'>
-            <span className='roadmap-day__badge'>Day {day.day}</span>
-            <h3 className='roadmap-day__focus'>{day.focus}</h3>
+const RoadMapDay = ({ day, completedTasks, onToggleTask }) => {
+    const totalTasks = day.tasks?.length || 0
+    const dayCompletedCount = (day.tasks || []).filter((_, i) => completedTasks[`day_${day.day}_task_${i}`]).length
+    const isDayCompleted = totalTasks > 0 && dayCompletedCount === totalTasks
+
+    return (
+        <div className={`roadmap-day ${isDayCompleted ? 'roadmap-day--completed' : ''}`}>
+            {/* Timeline Milestone Dot */}
+            <div className={`roadmap-node ${isDayCompleted ? 'roadmap-node--completed' : ''}`}>
+                <span>{day.day}</span>
+            </div>
+
+            {/* Day Content Card */}
+            <div className='roadmap-card'>
+                <div className='roadmap-card__header'>
+                    <div className='roadmap-card__title-group'>
+                        <span className={`roadmap-day-pill ${isDayCompleted ? 'roadmap-day-pill--completed' : ''}`}>
+                            Day {day.day}
+                        </span>
+                        <h3 className='roadmap-card__focus'>{day.focus}</h3>
+                    </div>
+
+                    <div className='roadmap-card__status'>
+                        {isDayCompleted ? (
+                            <span className='day-status-badge day-status-badge--completed'>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                                Completed
+                            </span>
+                        ) : (
+                            <span className='day-status-badge'>
+                                {dayCompletedCount}/{totalTasks} Done
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                <div className='roadmap-tasks'>
+                    {(day.tasks || []).map((task, i) => {
+                        const taskId = `day_${day.day}_task_${i}`
+                        const isDone = !!completedTasks[taskId]
+
+                        return (
+                            <div 
+                                key={i} 
+                                className={`task-item ${isDone ? 'task-item--checked' : ''}`}
+                                onClick={() => onToggleTask(taskId)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onToggleTask(taskId) }}
+                            >
+                                <div className={`task-checkbox ${isDone ? 'checked' : ''}`}>
+                                    {isDone && (
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <polyline points="20 6 9 17 4 12" />
+                                        </svg>
+                                    )}
+                                </div>
+                                <span className='task-text'>{task}</span>
+                            </div>
+                        )
+                    })}
+                </div>
+            </div>
         </div>
-        <ul className='roadmap-day__tasks'>
-            {day.tasks.map((task, i) => (
-                <li key={i}>
-                    <span className='roadmap-day__bullet' />
-                    {task}
-                </li>
-            ))}
-        </ul>
-    </div>
-)
+    )
+}
 
 // ── Main Component ────────────────────────────────────────────────────────────
 const Interview = () => {
     const [ activeNav, setActiveNav ] = useState('technical')
     const [ isDownloading, setIsDownloading ] = useState(false)
     const [ isResumeStudioOpen, setIsResumeStudioOpen ] = useState(false)
+    const [ completedTasks, setCompletedTasks ] = useState({})
     const { report, getReportById, loading, getResumePdf } = useInterview()
     const { interviewId } = useParams()
 
     useEffect(() => {
         if (interviewId) {
             getReportById(interviewId)
+            try {
+                const saved = localStorage.getItem(`roadmap_tasks_${interviewId}`)
+                if (saved) {
+                    setCompletedTasks(JSON.parse(saved))
+                }
+            } catch (e) {
+                console.error("Failed to load saved roadmap tasks:", e)
+            }
         }
     }, [ interviewId ])
+
+    const handleToggleTask = (taskId) => {
+        setCompletedTasks(prev => {
+            const next = { ...prev, [taskId]: !prev[taskId] }
+            try {
+                localStorage.setItem(`roadmap_tasks_${interviewId}`, JSON.stringify(next))
+            } catch (e) {
+                console.error("Failed to save roadmap tasks:", e)
+            }
+            return next
+        })
+    }
+
+    const allTasksCount = (report?.preparationPlan || []).reduce((acc, d) => acc + (d.tasks?.length || 0), 0)
+    const completedTasksCount = Object.keys(completedTasks).filter(k => completedTasks[k]).length
+    const progressPercent = allTasksCount > 0 ? Math.min(100, Math.round((completedTasksCount / allTasksCount) * 100)) : 0
 
     const handleDownload = async () => {
         setIsDownloading(true)
@@ -168,14 +245,36 @@ const Interview = () => {
                     )}
 
                     {activeNav === 'roadmap' && (
-                        <section>
+                        <section className='roadmap-section'>
                             <div className='content-header'>
-                                <h2>Preparation Road Map</h2>
+                                <div>
+                                    <h2>Preparation Road Map</h2>
+                                    <p className='section-subtext'>Interactive readiness track — check off tasks as you prepare.</p>
+                                </div>
                                 <span className='content-header__count'>{(report?.preparationPlan || []).length}-day plan</span>
                             </div>
+
+                            {/* Overall Progress Tracker Bar */}
+                            <div className='roadmap-progress-card'>
+                                <div className='progress-card-info'>
+                                    <span className='progress-label'>Readiness Track</span>
+                                    <span className='progress-stats'>
+                                        <strong>{completedTasksCount}</strong> of <strong>{allTasksCount}</strong> tasks completed ({progressPercent}%)
+                                    </span>
+                                </div>
+                                <div className='progress-track-bar'>
+                                    <div className='progress-track-fill' style={{ width: `${progressPercent}%` }} />
+                                </div>
+                            </div>
+
                             <div className='roadmap-list'>
                                 {(report?.preparationPlan || []).map((day) => (
-                                    <RoadMapDay key={day.day} day={day} />
+                                    <RoadMapDay 
+                                        key={day.day} 
+                                        day={day} 
+                                        completedTasks={completedTasks}
+                                        onToggleTask={handleToggleTask}
+                                    />
                                 ))}
                             </div>
                         </section>
